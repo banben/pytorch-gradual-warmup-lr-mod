@@ -28,7 +28,7 @@ class GradualWarmupScheduler(_LRScheduler):
                 if not self.finished:
                     self.after_scheduler.base_lrs = [base_lr * self.multiplier for base_lr in self.base_lrs]
                     self.finished = True
-                return self.after_scheduler.get_last_lr()
+                return [group['lr'] for group in self.optimizer.param_groups]
             return [base_lr * self.multiplier for base_lr in self.base_lrs]
 
         if self.multiplier == 1.0:
@@ -57,7 +57,7 @@ class GradualWarmupScheduler(_LRScheduler):
                     self.after_scheduler.step(None)
                 else:
                     self.after_scheduler.step(epoch - self.total_epoch)
-                self._last_lr = self.after_scheduler.get_last_lr()
+                self._last_lr = [group['lr'] for group in self.optimizer.param_groups]
             else:
                 return super(GradualWarmupScheduler, self).step(epoch)
         else:
